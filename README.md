@@ -15,7 +15,7 @@ make
 cd ../ && ./build/anguis
 ```
 
-### Features
+### Details
 - Written in C++ and OpenGL 4.1
 - Dependencies
     - GLAD (OpenGL loader)
