@@ -6,6 +6,9 @@ out vec4 FragColor;
 uniform vec2 resolution;
 uniform float time;
 
+uniform vec3 col1;
+uniform vec3 col2;
+
 void main() {
 
     vec2 uv = TexCoord * 2.0 - 1.0;
@@ -20,7 +23,6 @@ void main() {
     float glow = smoothstep(glowWidth, 0.0, dist);
     float core = smoothstep(lineWidth, 0.0, dist);
 
-    vec3 color = vec3(0.66, 0.4, 1.0) * glow + vec3(0.8, 0.2, 0.8) * core;
-
+    vec3 color = col1 * glow + col2 * core;
     FragColor = vec4(color, 1.0);
 }

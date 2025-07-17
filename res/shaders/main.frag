@@ -11,6 +11,7 @@ in vec4 FragPosLightSpace;
 uniform sampler2D _texture;
 uniform sampler2D shadowMap;
 uniform vec3 pelletColor;
+uniform float opacity;
 uniform float vignetteStrength;
 
 uniform vec3 lightPos;
@@ -91,6 +92,6 @@ void main()
         BrightColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
 
-    FragColor = Posterize(vec4(result, 1.0)) * vig;
+    FragColor = Posterize(vec4(result, opacity)) * vig;
     BrightColor = BrightColor * vig;
 }

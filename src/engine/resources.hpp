@@ -34,7 +34,7 @@ class Resources {
             Shader bloom;
             Shader glowline;
             Shader psystem;
-
+            Shader fade;
         } shaders;
 
         struct GameObjects {
@@ -47,7 +47,6 @@ class Resources {
         Lighting lighting;
         Gui gui;
         Client client;
-        ParticleSystem psystem;
 
         std::vector<glm::mat4> pp;
 
@@ -56,4 +55,5 @@ class Resources {
 
         void renderGameScene();
         void renderMenuScene();
+        void renderDeadScene();
 };

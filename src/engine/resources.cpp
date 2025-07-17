@@ -9,7 +9,8 @@ Resources::Resources() :
         Shader("res/shaders/blur.vert", "res/shaders/blur.frag"),
         Shader("res/shaders/bloom.vert", "res/shaders/bloom.frag"),
         Shader("res/shaders/glowline.vert", "res/shaders/glowline.frag"),
-        Shader("res/shaders/psystem.vert", "res/shaders/psystem.frag")
+        Shader("res/shaders/psystem.vert", "res/shaders/psystem.frag"),
+        Shader("res/shaders/fade.vert", "res/shaders/fade.frag")
     },
     gameobjects {
         Ground{},
@@ -19,12 +20,12 @@ Resources::Resources() :
     camera {window},
     lighting {window, shaders.depth, shaders.blur, shaders.bloom},
     gui {window},
-    client {},
-    psystem {"res/models/icosphere.obj", 500}
+    client {}
 {
 
     shaders.main.use();
     camera.setMatrices(shaders.main);
+    shaders.main.setFloat("opacity", 1.0);
     shaders.main.setInt("_texture", 0);
     shaders.main.setInt("shadowMap", 1);
     shaders.main.setFloat("vignetteStrength", 0.75);
@@ -40,9 +41,9 @@ void Resources::renderGameScene() {
 
     glCullFace(GL_FRONT);
     gameobjects.ground.render(shaders.depth);
-    gameobjects.snake.render(shaders.depth);
+    gameobjects.snake.render(shaders.depth, shaders.fade, shaders.psystem, camera, lighting, state, dt);
 
-    if (state.gameMode == MULTIPLAYER) client.renderPeers(shaders.depth);
+    if (state.gameMode == MULTIPLAYER) client.renderPeers(shaders.depth, shaders.fade, shaders.psystem, camera, lighting, state, dt);
 
     gameobjects.food.render(shaders.depth, gameobjects.snake, time);
     glCullFace(GL_BACK);
@@ -70,17 +71,11 @@ void Resources::renderGameScene() {
     glBindTexture(GL_TEXTURE_2D, lighting.getDepthBuffer());
 
     gameobjects.ground.render(shaders.main);
-    gameobjects.snake.render(shaders.main);
+    gameobjects.snake.render(shaders.main, shaders.fade, shaders.psystem, camera, lighting, state, dt);
 
-    if (state.gameMode == MULTIPLAYER) client.renderPeers(shaders.main);
+    if (state.gameMode == MULTIPLAYER) client.renderPeers(shaders.main, shaders.fade, shaders.psystem, camera, lighting, state, dt);
     
     gameobjects.food.render(shaders.main, gameobjects.snake, time);
-
-    if (window.keyDown(GLFW_KEY_R)) {
-        psystem.reset();
-    }
-
-    //psystem.use(shaders.psystem, camera, lighting, dt);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -98,12 +93,31 @@ void Resources::renderMenuScene() {
     shaders.glowline.use();
     shaders.glowline.setVec2("resolution", glm::vec2(framebufferSize.x, framebufferSize.y));
     shaders.glowline.setFloat("time", time);
+    shaders.glowline.setVec3("col1", glm::vec3(0.66, 0.4, 1.0));
+    shaders.glowline.setVec3("col2", glm::vec3(0.8, 0.2, 0.8));
+    util::renderQuad();
+}
+
+void Resources::renderDeadScene() {
+    state.mouseState = NORMAL;
+
+    glm::ivec2 framebufferSize;
+    glfwGetFramebufferSize(window.getWindow(), &framebufferSize.x, &framebufferSize.y);
+
+    shaders.glowline.use();
+    shaders.glowline.setVec2("resolution", glm::vec2(framebufferSize.x, framebufferSize.y));
+    shaders.glowline.setFloat("time", time);
+
+    shaders.glowline.setVec3("col1", glm::vec3(0.8, 0.1, 0.1));
+    shaders.glowline.setVec3("col2", glm::vec3(1.0, 0.0, 0.1));
+
     util::renderQuad();
 }
 
 void Resources::render() {
     if (state.scene == GAME || state.scene == PAUSED) renderGameScene();
     else if (state.scene == MENU) renderMenuScene();
+    else if (state.scene == DEAD) renderDeadScene();
 }
 
 void Resources::beginUpdate() {
@@ -131,7 +145,8 @@ void Resources::endUpdate() {
 
     //if (state.scene == MENU) gameobjects.snake.reset();
 
-    gui.update(client, state, dt);
+
+    gui.update(client, state, gameobjects.snake.score, dt);
     gui.render();
 
     glfwSwapBuffers(window.getWindow());

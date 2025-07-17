@@ -48,3 +48,15 @@ void Camera::update(Window& window) {
 
     forward = glm::normalize(front);
 }
+
+void Camera::shake() {
+    float strength = 1.0f;
+    glm::vec3 offset = glm::vec3(
+        (rand() / (float) RAND_MAX - 0.5f) * 2.0f,
+        (rand() / (float) RAND_MAX - 0.5f) * 2.0f,
+        (rand() / (float) RAND_MAX - 0.5f) * 2.0f
+    ) * strength;
+
+
+    view = glm::translate(view, offset);
+}

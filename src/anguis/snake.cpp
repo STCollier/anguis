@@ -19,7 +19,7 @@ Snake::Snake()
 
     speed = currentSpeed;
     
-    for (int i = 1; i < 10; i++) {
+    for (int i = 1; i < START_SIZE; i++) {
         positions.push_back(glm::vec2(position.x, position.y + static_cast<float>(i) * segmentRadius * 2));
     }
 }
@@ -55,6 +55,8 @@ static float l = 0;
 static float vig = 0.7;
 
 void Snake::update(Window& window, Shader& mainShader, Camera& camera, float dt) {
+    score = positions.size() - START_SIZE + 1; // +1 because the loop to init snake segments starts at 1
+
     // Third person movement with WASD
     /*if (window.keyDown(GLFW_KEY_W)) dy -= 1.0f;
     if (window.keyDown(GLFW_KEY_S)) dy += 1.0f;
@@ -75,12 +77,20 @@ void Snake::update(Window& window, Shader& mainShader, Camera& camera, float dt)
     if (window.mouseDown(GLFW_MOUSE_BUTTON_LEFT) && !interactingWithUI) {
         l < 1.0 ? l += dt * 2.0 : l = 1.0;
         speed = util::lerp(currentSpeed, maxSpeed, util::easeInOutSine(l));
-        camera.FOV = util::lerp(45.0f, 60.0f, util::easeInOutSine(l));
+
+        if (firstPerson) {
+            camera.FOV = util::lerp(45.0f, 60.0f, util::easeInOutSine(l));
+        }
+
         vig = util::lerp(0.75, 0.6, util::easeInOutSine(l));
     } else {
         l > 0.0 ? l -= dt * 2.0 : l = 0.0;
         speed = util::lerp(currentSpeed, maxSpeed, util::easeInOutSine(l));
-        camera.FOV = util::lerp(45.0f, 60.0f, util::easeInOutSine(l));
+
+        if (firstPerson) {
+            camera.FOV = util::lerp(45.0f, 60.0f, util::easeInOutSine(l));
+        }
+        
         vig = util::lerp(0.75, 0.6, util::easeInOutSine(l));
     }
 
@@ -95,7 +105,7 @@ void Snake::update(Window& window, Shader& mainShader, Camera& camera, float dt)
     if (!window.keyDown(GLFW_KEY_TAB) && toggled) toggled = false;
 
     glm::vec2 direction = glm::normalize(glm::vec2(camera.forward.x, camera.forward.z));
-    /*if (!dead)*/ position += direction * speed * dt;
+    if (!dead) position += direction * speed * dt;
 
     camera.view = glm::mat4(1.0f);
 
@@ -108,7 +118,7 @@ void Snake::update(Window& window, Shader& mainShader, Camera& camera, float dt)
         camera.position = camPos;
     } else {
         camera.view = glm::rotate(camera.view, (float) glm::radians(45.0), glm::vec3(1.f, 0.f, 0.f));
-        camera.view = glm::translate(camera.view, glm::vec3(0.0f, -100.0f, -100.0f));
+        camera.view = glm::translate(camera.view, glm::vec3(0.0f, -125.0f, -150.0f));
     }
 
     for (size_t i = 1; i < positions.size(); i++) {
@@ -123,12 +133,27 @@ void Snake::update(Window& window, Shader& mainShader, Camera& camera, float dt)
 
     slither(position.x, position.y);
 
+
     /*if (window.keyDown(GLFW_KEY_SPACE)) {
         grow();
     }*/
+
+    if (dead) {
+        camera.shake();
+    }
 }
 
-void Snake::render(Shader& shader) {
+static float deathFade = 0.0f;
+
+void Snake::render(
+    Shader& mainShader, 
+    Shader& fadeShader, 
+    Shader& particleShader,
+    Camera& camera, 
+    Lighting& lighting,
+    State& state, 
+    float dt
+) {
     glActiveTexture(GL_TEXTURE0);
 
     for (size_t i = 0; i < positions.size(); i++) {
@@ -158,7 +183,27 @@ void Snake::render(Shader& shader) {
         model = glm::rotate(model, angle, glm::vec3(0.f, 1.f, 0.f));
         model = glm::scale(model, glm::vec3(segmentRadius * 2));
     
-        m_model.render(shader, model);
+        if (!dead) m_model.render(mainShader, model);
+    }
+
+    if (dead) {
+        psystem.use(particleShader, camera, lighting, dt);
+        afterDeathTimer += dt;
+    }
+
+    // Wait 2 seconds before going to death screen
+    if (dead && afterDeathTimer >= 1.0f) {
+        deathFade += dt * 0.5;
+
+        fadeShader.use();
+        fadeShader.setFloat("fade", deathFade);
+        util::renderQuad();
+    }
+
+    if (deathFade >= 1.0f) {
+        deathFade = 0.0f;
+        reset();
+        state.scene = DEAD;
     }
 }
 
@@ -215,6 +260,21 @@ void Snake::grow() {
 
 void Snake::die() {
     dead = true;
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> distr(0, positions.size() - 1);
+
+    std::vector<glm::vec3> ppos = std::vector<glm::vec3>(512);
+    for (size_t i = 0; i < 512; i++) {
+        glm::vec2 xz = util::getRandomPointInCircle(positions[distr(gen)], segmentRadius);
+        ppos[i] = glm::vec3(xz.x, snakeY, xz.y);
+    }
+
+    // Check if psystem is unitilized
+    if (psystem.amount == 0) {
+        psystem = ParticleSystem {"res/models/icosphere.obj", 512, ppos};
+    }
 }
 
 // Based on head position
@@ -231,10 +291,11 @@ void Snake::reset() {
     dx = 0.0f;
     dy = 0.0f;
     position = {0.0f, 0.0f};
+    dead = false;
 
     positions.clear();
     
-    for (int i = 1; i < 16; i++) {
+    for (int i = 1; i < START_SIZE; i++) {
         positions.push_back(glm::vec2(0.0f, static_cast<float>(i) * segmentRadius * 2));
     }
 }

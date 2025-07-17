@@ -1,12 +1,112 @@
+// please dont look at this file this is not my best work
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include "gui.hpp"
 
-void centeredCheckbox(const char* label, bool* value, float window_width) {
+static void centeredCheckbox(const char* label, bool* value, float window_width) {
     float width = ImGui::GetFrameHeight() + ImGui::GetStyle().ItemInnerSpacing.x + ImGui::CalcTextSize(label).x;
     ImGui::SetCursorPosX((window_width - width) * 0.5f);
     ImGui::Checkbox(label, value);
+}
+
+void overlay(ImGuiIO& io, float timer) {
+    //assert(timer >= 0 && timer <= 1.0);
+
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGui::SetNextWindowSize(io.DisplaySize);
+    ImGui::SetNextWindowBgAlpha(1.0f - timer);
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.f, 0.f, 0.f, 1.f)); 
+
+    ImGui::Begin("FullscreenOverlay", nullptr,
+        ImGuiWindowFlags_NoTitleBar |
+        ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_AlwaysAutoResize |
+        ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoScrollbar |
+        ImGuiWindowFlags_NoInputs
+    );
+
+    ImGui::PopStyleColor();
+
+    ImGui::End();
+}
+
+void Gui::deadScene(ImGuiIO& io, State& state, float fade, int score) {
+    ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.15f), ImGuiCond_Always, ImVec2(0.5f,0.5f));
+    ImGui::SetNextWindowBgAlpha(0.0f);
+
+    ImGui::Begin("MenuOverlay", nullptr,
+        ImGuiWindowFlags_NoTitleBar |
+        ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_AlwaysAutoResize |
+        ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoScrollbar
+    );
+
+    ImGui::Image((ImTextureID) (intptr_t) deadTexture.getID(), ImVec2(titleTexture.width * 0.25, titleTexture.height * 0.25), {0, 1}, {1, 0});
+
+    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(150, 25, 25, 255));
+    ImGui::PushFont(font_impact);
+    float ww = ImGui::GetWindowSize().x;
+
+    if (state.gameMode == MULTIPLAYER) {
+        std::string text = "[ You were slain by Username ]";
+        float text_width = ImGui::CalcTextSize(text.c_str()).x;
+        ImGui::SetCursorPosX((ww - text_width) * 0.5f);
+        ImGui::Text("%s", text.c_str());
+    }
+
+    std::string scoretxt = "Score: " + std::to_string(score);
+    float tw = ImGui::CalcTextSize(scoretxt.c_str()).x;
+    ImGui::SetCursorPosX((ww - tw) * 0.5f);
+    ImGui::Text("%s", scoretxt.c_str());
+
+
+    ImGui::PopStyleColor();
+    ImGui::PopFont();
+    
+    ImGui::End();
+
+    ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.75f), ImGuiCond_Always, ImVec2(0.5f,0.5f));
+    ImGui::SetNextWindowBgAlpha(0.0f);
+
+    ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.75f), ImGuiCond_Always, ImVec2(0.5f,0.5f));
+    ImGui::SetNextWindowBgAlpha(0.0f);
+
+    ImGui::Begin("MenuButtonOverlay", nullptr,
+        ImGuiWindowFlags_NoTitleBar |
+        ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_AlwaysAutoResize |
+        ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoScrollbar);
+
+    float window_width = ImGui::GetWindowSize().x;
+
+    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 0, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(0, 0, 0, 0));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, IM_COL32(150, 25, 25, 100));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, IM_COL32(150, 25, 25, 100));
+
+    ImGui::PushFont(font_title);
+    ImGui::SetCursorPosX((window_width - ImGui::CalcTextSize("Menu").x * 4.0f) * 0.5f);
+    
+    if (ImGui::Button("Menu", ImVec2(ImGui::CalcTextSize("Menu").x * 4.0f, 0))) {
+        state.scene = MENU;
+    }
+
+    ImGui::PopFont();
+
+    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
+
+    ImGui::End();
+
+    overlay(io, fade);
 }
 
 void Gui::pauseMenu(ImGuiIO& io, State& state, Client& client) {
@@ -258,7 +358,7 @@ void Gui::chatbox(ImGuiIO& io, [[maybe_unused]] State& state, Client& client) {
     ImGui::End();
 }
 
-Gui::Gui(Window& window) : titleTexture {"res/textures/title.png", LINEAR} {
+Gui::Gui(Window& window) : titleTexture {"res/textures/title.png", LINEAR}, deadTexture {"res/textures/dead.png", LINEAR} {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
@@ -278,6 +378,7 @@ Gui::Gui(Window& window) : titleTexture {"res/textures/title.png", LINEAR} {
     font_title = io.Fonts->AddFontFromFileTTF("res/fonts/default_font.ttf", 40.0f, NULL, io.Fonts->GetGlyphRangesDefault());
     font_small = io.Fonts->AddFontFromFileTTF("res/fonts/default_font.ttf", 15.0f, NULL, io.Fonts->GetGlyphRangesDefault());
     font_default = io.Fonts->AddFontFromFileTTF("res/fonts/default_font.ttf", 20.0f, NULL, io.Fonts->GetGlyphRangesDefault());
+    font_impact = io.Fonts->AddFontFromFileTTF("res/fonts/impact.ttf", 40.0f, NULL, io.Fonts->GetGlyphRangesDefault());
 
     ImGui::StyleColorsDark();
 
@@ -291,10 +392,11 @@ Gui::~Gui() {
     ImGui::DestroyContext();
 }
 
-float counter = 0;
-float FPS = 0;
+static float counter = 0;
+static float FPS = 0;
+static float deathFade = -0.25f;
 
-void Gui::update(Client& client, State& state, float dt) {
+void Gui::update(Client& client, State& state, int score, float dt) {
     ImGuiIO& io = ImGui::GetIO();
     
     ImGui_ImplOpenGL3_NewFrame();
@@ -330,11 +432,15 @@ void Gui::update(Client& client, State& state, float dt) {
 
     if (state.scene == PAUSED) pauseMenu(io, state, client);
     else if (state.scene == MENU) {
+        deathFade = -0.25f;
         startMenu(io, state);
     } else if (state.scene == SELECT) {
         selectMenu(io, state, client);
     } else if (state.scene == GAME && state.gameMode == MULTIPLAYER) {
         chatbox(io, state, client);
+    } else if (state.scene == DEAD) {
+        deathFade += dt * 0.5f;
+        deadScene(io, state, deathFade, score);
     }
 }
 

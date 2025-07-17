@@ -16,7 +16,7 @@ struct PeerData {
 class Client {
     public:
         void connect(const std::string& server, const int port, const std::string& username);
-        void renderPeers(Shader& shader);
+        void renderPeers(Shader& mainShader, Shader& fadeShader, Shader& particleShader, Camera& camera, Lighting& lighting, State& state, float dt);
         void disconnect();
         void update(Snake& snake, float dt);
         void emitPeerData(Snake& snake);

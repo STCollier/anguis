@@ -10,6 +10,7 @@
 class Particle {
     public:
         Particle(glm::vec3 position, glm::vec3 color);
+        Particle() = default;
 
         void update(float dt);
         
@@ -24,14 +25,15 @@ class Particle {
 
 class ParticleSystem {
     public:
-        ParticleSystem(const std::string& modelSrc, size_t amount);
+        ParticleSystem(const std::string& modelSrc, size_t amount, std::vector<glm::vec3> positions);
+        ParticleSystem() = default;
 
         void reset();
         void update(float dt);
         void render(Shader& shader);
         void use(Shader& shader, Camera& camera, Lighting& lighting, float dt);
 
-        size_t amount;
+        size_t amount = 0;
         std::vector<bool> remaining;
         bool done;
 

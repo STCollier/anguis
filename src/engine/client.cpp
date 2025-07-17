@@ -94,9 +94,9 @@ void Client::on_chat_message([[maybe_unused]] const std::string& name, sio::mess
     chatMessages.push_back(std::format("{}: {}", username, message));
 }
 
-void Client::renderPeers(Shader& shader) {
+void Client::renderPeers(Shader& mainShader, Shader& fadeShader, Shader& particleShader, Camera& camera, Lighting& lighting, State& state, float dt) {
     for (auto& [id, snake] : peerSnakes) {
-        snake.get()->render(shader);
+        snake.get()->render(mainShader, fadeShader, particleShader, camera, lighting, state, dt);
     }
 }
 

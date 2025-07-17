@@ -16,6 +16,7 @@ enum Scene {
     GAME,
     PAUSED,
     MENU,
+    DEAD,
     SELECT,
     QUIT
 };

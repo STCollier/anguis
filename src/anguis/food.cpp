@@ -25,7 +25,7 @@ void Food::spawnPellet() {
     std::uniform_real_distribution<float> dist(0.0f, 1.0f);
     std::uniform_int_distribution<std::size_t> listDist(0, colors.size() - 1);
 
-    glm::vec2 pos = util::getRandomPointInCircle(100.0f);
+    glm::vec2 pos = util::getRandomPointInCircle(util::GLM_VEC2_ZERO, 100.0f);
 
     foodPellets.push_back({
         glm::vec3(pos.x, 0.0, pos.y),

@@ -9,6 +9,7 @@ class Camera {
 
         void setMatrices(Shader& shader);
         void update(Window& window);
+        void shake();
         
         glm::mat4 projection;
         glm::mat4 view;

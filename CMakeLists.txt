@@ -8,7 +8,6 @@ file(GLOB_RECURSE SRC_CPP
     src/main.cpp
     src/engine/*.cpp
     src/anguis/*.cpp
-    lib/imgui/*.cpp
 )
 
 add_subdirectory(lib/socketio)

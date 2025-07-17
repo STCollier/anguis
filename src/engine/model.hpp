@@ -24,6 +24,7 @@ class Model {
         Model(const std::string& src);
         // Used for loading instanced data
         Model(const std::string& src, size_t instanceCount);
+        Model() = default;
         ~Model();
 
         void updateInstanceData(size_t count, std::vector<glm::mat4>& matrices, std::vector<glm::vec4>& colors);
