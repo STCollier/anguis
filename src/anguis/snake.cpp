@@ -54,6 +54,14 @@ static bool toggled = false;
 static float l = 0;
 static float vig = 0.7;
 
+bool Snake::collideWithOther(std::vector<glm::vec2>& pos) {
+    for (size_t i = 1; i < pos.size(); i++) {
+        if (collide(glm::vec3(pos[i].x, snakeY, pos[i].y), segmentRadius * 0.95)) return true;
+    }
+
+    return false;
+}
+
 void Snake::update(Window& window, Shader& mainShader, Camera& camera, float dt) {
     score = positions.size() - START_SIZE + 1; // +1 because the loop to init snake segments starts at 1
 
@@ -121,15 +129,7 @@ void Snake::update(Window& window, Shader& mainShader, Camera& camera, float dt)
         camera.view = glm::translate(camera.view, glm::vec3(0.0f, -125.0f, -150.0f));
     }
 
-    for (size_t i = 1; i < positions.size(); i++) {
-        if (collide(glm::vec3(positions[i].x, snakeY, positions[i].y), segmentRadius * 0.95)) {
-            die();
-        }
-    }
-
-    if (!collide(glm::vec3(0.0, 2.0, 0.0), 115.0f)) {
-        die();
-    }
+    if (collideWithOther(positions) || !collide(glm::vec3(0.0, 2.0, 0.0), 115.0f)) die();
 
     slither(position.x, position.y);
 

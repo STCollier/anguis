@@ -120,6 +120,7 @@ void Resources::render() {
     else if (state.scene == DEAD) renderDeadScene();
 }
 
+static bool reset = false;
 void Resources::beginUpdate() {
     dt = window.deltaTime();
     time = window.time();
@@ -131,6 +132,14 @@ void Resources::beginUpdate() {
     state.update(window);
 
     if (state.gameMode == MULTIPLAYER) client.update(gameobjects.snake, dt);
+    if (state.scene == MENU && !reset) {
+        gameobjects.snake.reset();
+        reset = true;
+    }
+
+    if (state.scene == GAME) {
+        reset = false;
+    }
 }
 
 void Resources::endUpdate() {

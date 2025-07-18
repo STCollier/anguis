@@ -268,6 +268,7 @@ void Gui::selectMenu(ImGuiIO& io, State& state, Client& client) {
         ImGui::SetCursorPosX((ww - bw) * 0.5f);
         if (ImGui::Button("Join", ImVec2(bw, 0))) {
             client.connect(address, port, username);
+            client.setUsername(username);
             state.mouseState = LOCKED;
             state.scene = GAME;
         }

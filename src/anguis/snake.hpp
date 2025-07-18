@@ -29,6 +29,7 @@ class Snake {
             float dt
         );
         void update(Window& window, Shader& mainShader, Camera& camera, float dt);
+        bool collideWithOther(std::vector<glm::vec2>& pos);
         bool collide(glm::vec3 other, float radius);
         void grow();
         void die();
