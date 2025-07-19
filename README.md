@@ -7,6 +7,10 @@ All models/textures by me. Sound is from opengameart.org <br>
 ![screenshot](screenshot.png)
 <br>
 
+### Controls
+Mouse to move
+TAB to change POV (toggles between first and third person)
+
 ### Building
 ```
 git clone https://github.com/STCollier/anguis
