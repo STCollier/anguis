@@ -34,7 +34,7 @@ void Food::spawnPellet() {
     });
 }
 
-void Food::render(Shader& shader, Snake& snake, float time) {
+void Food::render(Shader& shader, Snake& snake, Audio& audio, float time) {
     glActiveTexture(GL_TEXTURE0);
     m_texture.bind();
 
@@ -54,6 +54,7 @@ void Food::render(Shader& shader, Snake& snake, float time) {
             it = foodPellets.erase(it);
             spawnPellet();
             snake.grow();
+            audio.play("res/sounds/food.wav");
         } else {
             it++;
         }

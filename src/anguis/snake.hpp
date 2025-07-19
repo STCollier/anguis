@@ -8,6 +8,7 @@
 #include "../engine/lighting.hpp"
 #include "../engine/psystem.hpp"
 #include "../engine/state.hpp"
+#include "../engine/audio.hpp"
 
 #include <vector>
 
@@ -28,7 +29,7 @@ class Snake {
             State& state, 
             float dt
         );
-        void update(Window& window, Shader& mainShader, Camera& camera, float dt);
+        void update(Window& window, Shader& mainShader, Camera& camera, Audio& audio, float dt);
         bool collideWithOther(std::vector<glm::vec2>& pos);
         bool collide(glm::vec3 other, float radius);
         void grow();

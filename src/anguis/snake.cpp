@@ -62,7 +62,7 @@ bool Snake::collideWithOther(std::vector<glm::vec2>& pos) {
     return false;
 }
 
-void Snake::update(Window& window, Shader& mainShader, Camera& camera, float dt) {
+void Snake::update(Window& window, Shader& mainShader, Camera& camera, Audio& audio, float dt) {
     score = positions.size() - START_SIZE + 1; // +1 because the loop to init snake segments starts at 1
 
     // Third person movement with WASD
@@ -139,6 +139,7 @@ void Snake::update(Window& window, Shader& mainShader, Camera& camera, float dt)
     }*/
 
     if (dead) {
+        audio.play("res/sounds/death.wav");
         camera.shake();
     }
 }

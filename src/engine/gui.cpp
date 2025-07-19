@@ -53,7 +53,7 @@ void Gui::deadScene(ImGuiIO& io, State& state, float fade, int score) {
     float ww = ImGui::GetWindowSize().x;
 
     if (state.gameMode == MULTIPLAYER) {
-        std::string text = "[ You were slain by Username ]";
+        std::string text = "[ You were slain by a Snake ]";
         float text_width = ImGui::CalcTextSize(text.c_str()).x;
         ImGui::SetCursorPosX((ww - text_width) * 0.5f);
         ImGui::Text("%s", text.c_str());
@@ -279,11 +279,6 @@ void Gui::selectMenu(ImGuiIO& io, State& state, Client& client) {
         }
 
         ImGui::End();
-    }
-
-    ImGui::SetCursorPosX((window_width - button_width) * 0.5f);
-    if (ImGui::Button("Settings", ImVec2(button_width, 0))) {
-
     }
 
     ImGui::SetCursorPosX((window_width - button_width) * 0.5f);

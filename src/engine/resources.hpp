@@ -8,6 +8,7 @@
 #include "gui.hpp"
 #include "client.hpp"
 #include "psystem.hpp"
+#include "audio.hpp"
 
 #include "../anguis/ground.hpp"
 #include "../anguis/snake.hpp"
@@ -47,6 +48,7 @@ class Resources {
         Lighting lighting;
         Gui gui;
         Client client;
+        Audio audio;
 
         std::vector<glm::mat4> pp;
 

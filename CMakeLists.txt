@@ -10,13 +10,13 @@ file(GLOB_RECURSE SRC_CPP
     src/anguis/*.cpp
 )
 
-add_subdirectory(lib/socketio)
-
 find_package(glm REQUIRED)
-find_package(OpenSSL REQUIRED) # Normally I don't think this line would be required but mac is stupid and needs it
+find_package(OpenSSL REQUIRED)
 add_subdirectory(lib/glad)
 add_subdirectory(lib/glfw)
 add_subdirectory(lib/imgui)
+add_subdirectory(lib/socketio)
+add_subdirectory(lib/openal-soft)
 
 add_executable(anguis ${SRC_CPP})
 
@@ -30,4 +30,5 @@ target_link_libraries(anguis PRIVATE
     imgui
     OpenSSL::SSL
     OpenSSL::Crypto
+    OpenAL::OpenAL
 )

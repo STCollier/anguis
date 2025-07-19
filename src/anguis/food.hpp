@@ -3,6 +3,7 @@
 #include "../engine/model.hpp"
 #include "../engine/texture.hpp"
 #include "../engine/shader.hpp"
+#include "../engine/audio.hpp"
 
 #include "snake.hpp"
 
@@ -16,7 +17,7 @@ class Food {
     public:
         Food();
 
-        void render(Shader& shader, Snake& snake, float time);
+        void render(Shader& shader, Snake& snake, Audio& audio, float time);
     
     private:
         Model m_model;

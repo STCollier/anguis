@@ -20,7 +20,15 @@ Resources::Resources() :
     camera {window},
     lighting {window, shaders.depth, shaders.blur, shaders.bloom},
     gui {window},
-    client {}
+    client {},
+    audio {{
+        "res/sounds/click.wav",
+        "res/sounds/death.wav",
+        "res/sounds/food.wav",
+        "res/sounds/menu.wav",
+        "res/sounds/game.wav"
+        
+    }}
 {
 
     shaders.main.use();
@@ -29,6 +37,8 @@ Resources::Resources() :
     shaders.main.setInt("_texture", 0);
     shaders.main.setInt("shadowMap", 1);
     shaders.main.setFloat("vignetteStrength", 0.75);
+
+    audio.play("res/sounds/menu.wav");
 }
 
 Resources::~Resources() {
@@ -45,7 +55,7 @@ void Resources::renderGameScene() {
 
     if (state.gameMode == MULTIPLAYER) client.renderPeers(shaders.depth, shaders.fade, shaders.psystem, camera, lighting, state, dt);
 
-    gameobjects.food.render(shaders.depth, gameobjects.snake, time);
+    gameobjects.food.render(shaders.depth, gameobjects.snake, audio, time);
     glCullFace(GL_BACK);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -75,7 +85,7 @@ void Resources::renderGameScene() {
 
     if (state.gameMode == MULTIPLAYER) client.renderPeers(shaders.main, shaders.fade, shaders.psystem, camera, lighting, state, dt);
     
-    gameobjects.food.render(shaders.main, gameobjects.snake, time);
+    gameobjects.food.render(shaders.main, gameobjects.snake, audio, time);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -133,11 +143,17 @@ void Resources::beginUpdate() {
 
     if (state.gameMode == MULTIPLAYER) client.update(gameobjects.snake, dt);
     if (state.scene == MENU && !reset) {
+        audio.stop("res/sounds/game.wav");
+        audio.play("res/sounds/menu.wav");
+
         gameobjects.snake.reset();
         reset = true;
     }
 
     if (state.scene == GAME) {
+        audio.play("res/sounds/game.wav");
+        audio.stop("res/sounds/menu.wav");
+
         reset = false;
     }
 }
@@ -149,7 +165,7 @@ void Resources::endUpdate() {
 
     shaders.bloom.setInt("useBloom", state.settings.bloom);
     if (state.scene == GAME) {
-        gameobjects.snake.update(window, shaders.main, camera, dt);
+        gameobjects.snake.update(window, shaders.main, camera, audio, dt);
     }
 
     //if (state.scene == MENU) gameobjects.snake.reset();
