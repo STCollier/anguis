@@ -1,8 +1,8 @@
 # Anguis
 
-A 3D multiplayer third and first person snake game
-Multiplayer *may* have some bugs :)
-All models/textures by me. Sound is from opengameart.org
+A 3D multiplayer third and first person snake game <br>
+Multiplayer *may* have some bugs :) <br>
+All models/textures by me. Sound is from opengameart.org <br>
 
 ![screenshot](screenshot.png)
 <br>
@@ -19,7 +19,7 @@ cd ../ && ./build/anguis
 ```
 
 ### Details
-- Written in C++ and OpenGL 4.1
+- Written in C++26 and OpenGL 4.1
 - Dependencies
     - GLAD (OpenGL loader)
     - GLFW (windowing & input)
