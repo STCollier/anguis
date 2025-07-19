@@ -1,5 +1,8 @@
 # Anguis
+
 A 3D multiplayer third and first person snake game
+Multiplayer *may* have some bugs :)
+All models/textures by me. Sound is from opengameart.org
 
 ![screenshot](screenshot.png)
 <br>
