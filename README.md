@@ -24,9 +24,13 @@ cd ../ && ./build/anguis
     - ImGui (GUI)
     - socket.io (networking)
     - stb_image (loading images)
+    - dr_wav (loading wav files for OpenAL)
+    - openal-soft (Open Audio Library for playing audio)
 - Graphical Features
     - .obj loader
     - HDR & Bloom
     - Real-time shadows
     - Multiplayer
     - Particle system
+    - Audio
+    - GUI done purely with ImGui <3
