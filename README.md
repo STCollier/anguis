@@ -2,7 +2,7 @@
 
 A 3D multiplayer third and first person snake game <br>
 Multiplayer *may* have some bugs :) <br>
-All models/textures by me. Sound is from opengameart.org <br>
+All models/textures by me. Music is from opengameart.org. SFX were created through SFXR <br>
 
 ![screenshot](screenshot.png)
 <br>
@@ -10,6 +10,7 @@ All models/textures by me. Sound is from opengameart.org <br>
 ### Controls
 Mouse to move
 TAB to change POV (toggles between first and third person)
+Left Click to move faster
 
 ### Building
 ```
